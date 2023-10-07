@@ -41,7 +41,7 @@ public class Tropcomp {
         }
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void executeTropcomp(String[] args) throws IOException {
         if (args.length != 5 && args.length != 3) {
             System.out.println("Format: tropcomp [-o <chemin-à-la-sortie.csv>] <chemin-de-l'entrée> <seuil>");
             return;
@@ -110,8 +110,8 @@ public class Tropcomp {
                 metricsList.addAll(gatherMetrics(file));
             }
             else if (file.getName().endsWith("Test.java")) {
-                int tloc = Tloc.countLines(file.getPath());
-                int tassert = Tassert.countAssertions(file.getPath());
+                int tloc = Tloc.calculateTloc(file);
+                int tassert = Tassert.calculateTassert(file);
                 metricsList.add(new TestFileMetrics(file.getPath(), tloc, tassert, file));
             }
         }
