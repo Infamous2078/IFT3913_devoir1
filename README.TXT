@@ -25,5 +25,5 @@ Obtenir les détails des fichiers d'un repertoir (Chemin du fichier, Nom du paqu
 Tassert de la classe, Tcmp de la classe) et, optionnellement, les enregistrer dans un fichier.csv:
 java Tls [-o <chemin-à-la-sortie.csv>] <chemin-de-l'entrée>
 
-Obtenir une liste de fichiers considérés comme trop compliqué/suspects:
-
+Obtenir une liste de fichiers considérés comme trop compliqué/suspects et, optionnellement, les enregistrer en .csv:
+java tropcomp [-o <chemin-à-la-sortie.csv>] <chemin-de-l'entrée> <seuil>
