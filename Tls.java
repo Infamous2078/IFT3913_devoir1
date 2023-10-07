@@ -44,13 +44,15 @@ public class Tls {
                 int tassert = Tassert.calculateTassert(file);
                 double val = tloc / (double) tassert;
                 double tcmp = Math.floor(val * 100) / 100;
-
-                output.append(file.getPath()).append(", ")
-                      .append(packageName).append(", ")
-                      .append(className).append(", ")
-                      .append(tloc).append(", ")
-                      .append(tassert).append(", ")
-                      .append(tcmp).append("\n");
+                
+                if (tloc!=0 && tassert!=0) {
+                    output.append(file.getPath()).append(", ")
+                        .append(packageName).append(", ")
+                        .append(className).append(", ")
+                        .append(tloc).append(", ")
+                        .append(tassert).append(", ")
+                        .append(tcmp).append("\n");
+                }
             }
         }
 
