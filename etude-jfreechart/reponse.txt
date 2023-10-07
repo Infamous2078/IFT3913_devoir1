@@ -1,0 +1,13 @@
+Utilité de trompcomp:
+
+Tout d'abord, tropcomp semble nous indiquer si dans un fichier de test, il ya trop de ligne de code par rapport aux nombre d'assertions effectuer vu qu'une classe est suspect si son ratio TLOC/TCMP est trop élevée.
+
+Analyse des résultat:
+
+Dans nos résultat on a un total de 350 fichiers testés et aucune classe suspecte n'a été identifiée à 1% et 5%, et seulement une seule classe à 10%. Cela suggère que la majorité du code de test est probablement bien écrit en termes de complexité ce qui n'est probablement pas vrai. Il est possible que les métriques choisies (TLOC et TCMP) soient soit trop strictes, ou pas pertinente pour identifier le vrai code complexe dans ce cas particulier. Ce qui veux dire que tropcomp n'est pas vraiment trés efficace.
+
+Suggestions pour améliorer tropcomp:
+
+Analyse de l'interdépendance: Plutôt que de regarder chaque fichier de manière isolée, il faudrais voir comment ils interagissent entre eux. Un fichier avec un TLOC faible mais qui interagit avec de nombreux autres fichiers pourrait toujours être complexe.
+
+Révision du seuil: Il serais bien de fixer un seuil minimum ou maximum aprés étude car peut être que a certain seuil tropcomp n'est pas vraiment pertinent.
