@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,10 +10,12 @@ public class Tropcomp {
         private String filePath;
         private double tloc;
         private double tcmp;
+        private File file;
 
-        public TestFileMetrics(String filePath, double tloc, double tassert) {
+        public TestFileMetrics(String filePath, double tloc, double tassert, File file) {
             this.filePath = filePath;
             this.tloc = tloc;
+            this.file = file;
             if (tassert != 0) {
                 this.tcmp = tloc / tassert;
             }
@@ -32,32 +35,88 @@ public class Tropcomp {
         public double getTloc() {
             return tloc;
         }
+
+        public File getFile() {
+            return file;
+        }
     }
 
-    public static List<String> findTopSuspectFiles(String directoryPath, double threshold) throws IOException {
-        File directory = new File(directoryPath);
-        File[] files = directory.listFiles();
-        List<TestFileMetrics> metricsList = new ArrayList<>();
-
-        for (File file : files) {
-            if (file.isFile() && file.getName().endsWith("Test.java")) {
-                int tloc = Tloc.countLines(file.getPath());
-                int tassert = Tassert.countAssertions(file.getPath());
-                metricsList.add(new TestFileMetrics(file.getPath(), tloc, tassert));
-            }
+    public static void main(String[] args) throws IOException {
+        if (args.length != 5 && args.length != 3) {
+            System.out.println("Format: tropcomp [-o <chemin-à-la-sortie.csv>] <chemin-de-l'entrée> <seuil>");
+            return;
         }
 
-        List<TestFileMetrics> topTLOCFiles = getTopFilesByTLOC(metricsList, threshold);
-        List<TestFileMetrics> topTCMPFiles = getTopFilesByTCMP(metricsList, threshold);
+        String outputPath = null;
+        String inputPath;
+        double seuil;
 
-        List<String> suspectFiles = new ArrayList<>();
+        if (args[1].equals("-o")) {
+            outputPath = args[2];
+            inputPath = args[3];
+            seuil = Double.parseDouble(args[4]) / 100;
+        }
+        else {
+            inputPath = args[1];
+            seuil = Double.parseDouble(args[2]) / 100;
+        }
+
+        File inputDir = new File(inputPath);
+        if (!inputDir.exists() || !inputDir.isDirectory()) {
+            System.out.println("Ce chemin d'entrée n'existe pas ou n'est pas un répertoire");
+            return;
+        }
+
+        List<File> suspectFiles = findSuspectFiles(inputDir.getAbsolutePath(), seuil);
+
+        String output = Tls.getOutput(null, suspectFiles);
+
+        if (outputPath != null) {
+            try (FileWriter fw = new FileWriter(outputPath)) {
+                fw.write(output);
+            }
+        }
+        else {
+            System.out.println(output);
+        }
+    }
+
+    public static List<File> findSuspectFiles(String directoryPath, double seuil) throws IOException {
+        List<TestFileMetrics> metricsList = gatherMetrics(new File(directoryPath));
+
+        List<TestFileMetrics> topTLOCFiles = getTopFilesByTLOC(metricsList, seuil);
+        List<TestFileMetrics> topTCMPFiles = getTopFilesByTCMP(metricsList, seuil);
+
+        List<File> suspectFiles = new ArrayList<>();
         for (TestFileMetrics metric : metricsList) {
             if (topTLOCFiles.contains(metric) && topTCMPFiles.contains(metric)) {
-                suspectFiles.add(metric.getFilePath());
+                suspectFiles.add(metric.getFile());
             }
         }
 
         return suspectFiles;
+    }
+
+    private static List<TestFileMetrics> gatherMetrics(File directory) throws IOException {
+        List<TestFileMetrics> metricsList = new ArrayList<>();
+
+        File[] files = directory.listFiles();
+
+        if (files == null)
+            return metricsList;
+
+        for (File file : files) {
+            if (file.isDirectory()) {
+                metricsList.addAll(gatherMetrics(file));
+            }
+            else if (file.getName().endsWith("Test.java")) {
+                int tloc = Tloc.countLines(file.getPath());
+                int tassert = Tassert.countAssertions(file.getPath());
+                metricsList.add(new TestFileMetrics(file.getPath(), tloc, tassert, file));
+            }
+        }
+
+        return metricsList;
     }
 
     private static List<TestFileMetrics> getTopFilesByTLOC(List<TestFileMetrics> metrics, double threshold) {
@@ -93,12 +152,4 @@ public class Tropcomp {
 
         return sortedList.subList(0, countToSelect);
     }
-
-    public static void main(String[] args) throws IOException {
-        List<String> suspectFiles = findTopSuspectFiles("C:\\Users\\maseu\\Desktop\\CoursA23\\IFT3913\\IFT3913_devoir1\\src\\testFiles", 0.2);
-        for (String file : suspectFiles) {
-            System.out.println(new File(file).getName());
-        }
-    }
 }
-
