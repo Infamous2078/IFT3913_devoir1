@@ -21,5 +21,6 @@ java Tloc <fichier>
 Obtenir le nombre d'assertions dans un fichier:
 java Tassert <fichier>
 
-Obtenir les détails
+Obtenir les détails d'un repertoire (Chemin du fichier, Nom du paquet, Nom de la classe, 
+Tloc de la classe, Tassert de la classe, Tcmp de la classe):
 java Tls <fichier>
