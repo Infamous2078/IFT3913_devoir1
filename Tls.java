@@ -9,7 +9,7 @@ public class Tls {
 
     public static void main(String[] args) throws IOException {
         if (args.length < 1) {
-            System.out.println("Format: tls [-o <chemin-à-la-sortie.csv>] <chemin-de-l'entrée>");
+            System.out.println("Format: Tls [-o <chemin-à-la-sortie.csv>] <chemin-de-l'entrée>");
             return;
         }
 
