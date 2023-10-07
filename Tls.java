@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class Tls {
@@ -15,15 +16,11 @@ public class Tls {
         String outputPath = null;
         String inputPath;
 
-        if (args[0].equals("-o")) {
-            if (args.length < 3) {
-                System.out.println("Il manque le Chemin d'entrée parmis les arguments");
-                return;
-            }
-            outputPath = args[1];
-            inputPath = args[2];
+        if (args[1].equals("-o")) {
+            outputPath = args[2];
+            inputPath = args[3];
         } else {
-            inputPath = args[0];
+            inputPath = args[1];
         }
 
         File inputDir = new File(inputPath);
@@ -32,37 +29,47 @@ public class Tls {
             return;
         }
 
+        String output = getOutput(inputDir, null);
+
+        if (outputPath != null) {
+            try (FileWriter fw = new FileWriter(outputPath)) {
+                fw.write(output);
+            }
+        } else {
+            System.out.println(output);
+        }
+    }
+
+    public static String getOutput(File inputDir, List<File> list) throws IOException {
         StringBuilder output = new StringBuilder();
         output.append("Chemin du fichier, Nom du paquet, Nom de la classe, Tloc de la classe, Tassert de la classe, Tcmp de la classe\n");
+        List<File> fileList;
+        if (inputDir != null && list == null) {
+            fileList = List.of(inputDir.listFiles());
+        }
+        else {
+            fileList = list;
+        }
 
-        for (File file : inputDir.listFiles()) {
+        for (File file : fileList) {
             if (file.getName().endsWith(".java")) {
                 String content = new String(Files.readAllBytes(file.toPath()));
                 String packageName = extractPackageName(content);
                 String className = extractClassName(file.getName());
-                int tloc = Tloc.calculateTloc(file);
-                int tassert = Tassert.calculateTassert(file);
+                int tloc = Tloc.countLines(file.getAbsolutePath());
+                int tassert = Tassert.countAssertions(file.getAbsolutePath());
                 double val = tloc / (double) tassert;
                 double tcmp = Math.floor(val * 100) / 100;
-                
-                if (tloc!=0 && tassert!=0) {
-                    output.append(file.getPath()).append(", ")
+
+                output.append(file.getPath()).append(", ")
                         .append(packageName).append(", ")
                         .append(className).append(", ")
                         .append(tloc).append(", ")
                         .append(tassert).append(", ")
                         .append(tcmp).append("\n");
-                }
             }
         }
-
-        if (outputPath != null) {
-            try (FileWriter fw = new FileWriter(new File(outputPath))) {
-                fw.write(output.toString());
-            }
-        } else {
-            System.out.println(output);
-        }
+        return output.toString();
     }
 
     private static String extractPackageName(String content) {
