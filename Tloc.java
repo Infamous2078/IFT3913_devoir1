@@ -13,7 +13,7 @@ public class Tloc {
         }
         File file = new File(args[0]);
         if (!file.exists() || !file.isFile()) {
-            System.out.println(file.getName() + " n'existe pas ou n'est pas un fichier.");
+            System.out.println("<fichier> n'existe pas ou n'est pas un fichier.");
             return;
         }
 
