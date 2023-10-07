@@ -9,7 +9,7 @@ public class Tls {
 
     public static void main(String[] args) throws IOException {
         if (args.length < 1) {
-            System.out.println("Format: Tls [-o <chemin-à-la-sortie.csv>] <chemin-de-l'entrée>");
+            System.out.println("Format: tls [-o <chemin-à-la-sortie.csv>] <chemin-de-l'entrée>");
             return;
         }
 
@@ -56,8 +56,8 @@ public class Tls {
                 String content = new String(Files.readAllBytes(file.toPath()));
                 String packageName = extractPackageName(content);
                 String className = extractClassName(file.getName());
-                int tloc = Tloc.countLines(file.getAbsolutePath());
-                int tassert = Tassert.countAssertions(file.getAbsolutePath());
+                int tloc = Tloc.calculateTloc(file);
+                int tassert = Tassert.calculateTassert(file);
                 double val = tloc / (double) tassert;
                 double tcmp = Math.floor(val * 100) / 100;
 
