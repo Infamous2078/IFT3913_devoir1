@@ -8,7 +8,7 @@ public class Tloc {
 
     public static void main(String[] args) throws IOException{
         if (args.length != 1) {
-            System.out.println("Format: java tloc <fichier>");
+            System.out.println("Format: java Tloc <fichier>");
             return;
         }
         File file = new File(args[0]);
