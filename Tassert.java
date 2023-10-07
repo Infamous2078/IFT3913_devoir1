@@ -11,7 +11,7 @@ public class Tassert {
         }
         File file = new File(args[0]);
         if (!file.exists() || !file.isFile()) {
-            System.out.println("Ce <nom de fichier> n'existe pas ou n'est pas un fichier.");
+            System.out.println("Ce <fichier> n'existe pas ou n'est pas un fichier.");
             return;
         }
 
